@@ -16,16 +16,22 @@ class order(db.Model):
     interest_item = db.Column('관심품목')
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = '고객' 
-    id = db.Column('ID')
+    id = db.Column('고객ID')
     username = db.Column('이름')
-    residence_area = db.Column('거주지역')
-    phone_num = db.Column('전화번호')
-    password_hash = db.Column('비밀번호')
+    residence_area = db.Column('지역')
+    password_hash = db.Column('password')
+    zzim = db.Column('관심상품')
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    def check_password(self,password):
+        return check_password_hash(self.password_hash, password)
     
 class product(db.Model):
-    __tablename__ = '공동구매그룹'
-    gid = db.Column('공구그룹ID')
+    __tablename__ = '상품'
+    pid = db.Column('상품ID')
     market_id = db.Column('마켓ID')
-    gradient_id = db.Column('상품ID')
+    category = db.Column('카테고리')
+    name = db.Column('상품명')

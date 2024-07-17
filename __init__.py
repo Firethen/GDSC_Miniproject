@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from app.models import db
 from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
@@ -18,20 +18,23 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = 'login'  # 로그인 페이지의 뷰 함수 이름
 
+    # 로그인되지않은 사용자가 로그인필요 페이지 접근할 때 핸들링
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return redirect(url_for('login'))
+
     #데이터베이스 모델 import 
-    from app.models import User, data  # 예시 데이터 모델
+    from app.models import User,product
 
     # Blueprint import
     from app.login import login_bp
-    from app.main import main_bp
     from app.product import product_bp
 
     # Blueprint 등록
     app.register_blueprint(login_bp)
-    app.register_blueprint(main_bp)
     app.register_blueprint(product_bp)
 
-        # 데이터베이스 생성
+    #데이터베이스 생성
     with app.app_context():
         db.create_all()
 
