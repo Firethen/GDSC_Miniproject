@@ -25,6 +25,20 @@ def get_product():
     
     return jsonify(product_list)
 
+#리스트 페이지에서 해당 상품,마켓ID에 해당하는 product_detail페이지로 접근(GET)
+# => 해당 상품에 대한 detail과 해당 상품,마켓ID에 해당하는 그룹들을 넘겨주기.
+
+# 해당 페이지에서 그룹공동구매버튼 클릭(로그인세션에 POST?)
+# => 유저의 장바구니에 담아두기.(로그인 동안만 유지되는 세션으로 관리)
+
+# 장바구니페이지 클릭(GET)
+# => user의 세션에 저장되어 있는 장바구니 공동구매그룹들을 return
+
+# 장바구니 페이지에서 최종구매 버튼 클릭(POST, UPDATE(해당 그룹의 인원수 업데이트))
+# => 해당 세션에서는 그 항목삭제되고, DB에 주문테이블에 추가, 그룹테이블에 업데이트 처리.
+
+
+
 @product_bp.route('/products/detail', methods=['POST'])
 @login_required
 def purchase_join_group():  #공동구매 그룹에 join
