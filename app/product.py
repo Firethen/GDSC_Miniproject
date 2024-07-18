@@ -25,6 +25,11 @@ def get_product():
     
     return jsonify(product_list)
 
+@product_bp.route('/products/detail', methods=['POST'])
+@login_required
+def purchase_join_group():  #공동구매 그룹에 join
+    
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~수정필요~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 @product_bp.route('/product/<int:product_id>/join_group', methods=['POST'])
