@@ -26,7 +26,7 @@ def login():
             return jsonify(user_info), 200
         else:
             abort(401, description="Invalid credentials")
-    abort(405)  # POST 요청 외의 메서드는 허용하지 않음
+    abort(405)  # POST 요청 외의 메서드는 허용하지 않음 
 
 @login_bp.route('/signup', methods=['POST'])
 def signup():

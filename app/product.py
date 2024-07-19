@@ -1,14 +1,14 @@
 #상품에 대한 공동구매, 관심클릭에 대한 CRUD구현
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
-from app.models import db, Product, Group, User, market
+from app.models import db, Product, Group, User, Market
 import json
 
 product_bp = Blueprint('product', __name__)
 
-#상품 리스트로 넘겨주기
+#상품 리스트로 넘겨주기(로그인된 user의 지역과 일치하는 상품들만)
 @product_bp.route('/products', methods=['GET'])
-@login_required
+@login_required 
 def get_products():
 
     # 현재 로그인된 유저의 ID를 가져옵니다
@@ -24,7 +24,7 @@ def get_products():
     product_list = []
     for product in products:
         # 상품의 마켓 정보를 가져옵니다
-        market_info = market.query.filter_by(market_id=product.market_id).first()
+        market_info = Market.query.filter_by(market_id=product.market_id).first()
         if not market_info:
             continue
         
@@ -66,7 +66,7 @@ def get_product_detail(product_id):
         return jsonify({'error': 'Product not found'}), 404
 
 # 그룹 참여 라우트
-@product_bp.route('/join_group', methods=['POST'])
+@product_bp.route('/products/<int:product_id>/join_group', methods=['POST'])
 @login_required
 def join_group():
     data = request.get_json()
@@ -86,39 +86,3 @@ def join_group():
 
     return jsonify({'group_id': group_id}), 200
 
-# 장바구니페이지 클릭(GET)
-# => user의 세션에 저장되어 있는 장바구니 공동구매그룹들을 return
-
-# 장바구니 페이지에서 최종구매 버튼 클릭(POST, UPDATE(해당 그룹의 인원수 업데이트))
-# => 구매개수도 requeset로 받고, 해당 세션에서는 그 항목삭제되고, DB에 주문테이블에 추가, 그룹테이블에 업데이트 처리.
-
-
-
-@product_bp.route('/products/detail', methods=['POST'])
-@login_required
-def purchase_join_group():  #공동구매 그룹에 join
-    
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~수정필요~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-@product_bp.route('/product/<int:product_id>/join_group', methods=['POST'])
-@login_required
-def join_group(product_id):
-    product = Product.query.get(gid)
-
-    if not product:
-        abort(404, description="Product not found")
-
-    # 현재 유저를 해당 상품의 그룹에 추가
-    if current_user not in product.groups:
-        product.groups.append(current_user)
-        db.session.commit()
-
-    # 클라이언트에게 응답으로 전달할 데이터 구성
-    response_data = {
-        'message': 'You joined the group for this product successfully',
-        'product_id': product.id,
-        'user_id': current_user.id
-    }
-
-    return jsonify(response_data), 200
