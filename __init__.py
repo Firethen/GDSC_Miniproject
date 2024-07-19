@@ -33,6 +33,8 @@ def create_app():
     # Blueprint 등록
     app.register_blueprint(login_bp)
     app.register_blueprint(product_bp)
+    app.register_blueprint(cart_bp)
+
 
     #데이터베이스 생성
     with app.app_context():
