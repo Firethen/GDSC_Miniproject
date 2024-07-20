@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
 from app.models import db, Product, Group, User, Market
 import json
-
+    
 product_bp = Blueprint('product', __name__)
 
 #상품 리스트로 넘겨주기(로그인된 user의 지역과 일치하는 상품들만)
