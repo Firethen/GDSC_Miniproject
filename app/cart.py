@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from flask_login import login_required, current_user
-from app.models import db, Product, Group, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
+from app.models import db, Product, Group, User, Market, Region,Region_Market,Purchase, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
 import json
 cart_bp = Blueprint('cart', __name__)
 
@@ -45,15 +45,15 @@ def group_purchase():
     if not group:
         return jsonify({'error': 'Group not found'}), 404
 
-    if group.current_size + purchase_quantity > group.max_size:
-        return jsonify({'error': 'Purchase exceeds group size limit'}), 400
+    '''if group.current_size + purchase_quantity > group.max_size:
+        return jsonify({'error': 'Purchase exceeds group size limit'}), 400'''
     
     # 현재 규모를 증가시킵니다.
-    group.current_size += purchase_quantity
+    group.size += 1
     db.session.commit()
 
-    # 'order' 테이블에 주문 정보를 추가합니다.
-    order = Order(user_id=current_user.id, gid=group_id, quantity=purchase_quantity)
+    # 'purchase' 테이블에 주문 정보를 추가합니다.
+    order = Purchase(customer_id=current_user.id, gonggu_group_id=group_id)
     db.session.add(order)
     db.session.commit()
 
