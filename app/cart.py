@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from flask_login import login_required, current_user
-from app.models import db, Group, Product, Market,Order
-
+from app.models import db, Product, Group, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
+import json
 cart_bp = Blueprint('cart', __name__)
 
 
@@ -10,17 +10,16 @@ cart_bp = Blueprint('cart', __name__)
 @login_required
 def get_cart():
     cart = session.get('cart', [])
-    groups = Group.query.filter(Group.gid.in_(cart)).all()
+    groups = Gonggu_group.query.filter(Gonggu_group.id.in_(cart)).all()
     group_list = []
     for group in groups:
-        prod = Product.query.filter_by(pid=group.product_id).first()
-        mark = Market.query.filter_by(mid=group.market_id).first()
+        prod = Gonggu_product.query.filter_by(id=group.gonggu_product_id).first()
         group_data = {
-            'group_id': group.gid,
-            '상품 이름': prod.name,
-            '마켓 이름': mark.market_name,
-            '최대 규모': group.grup_size,
-            '현재 규모': group.current_size
+            'group_id'  : group.id,
+            'market_id' : prod.market_id,
+            'product_id': prod.product_id,
+            'price'     : prod.price,       #가격
+            'group_size': group.size
         }
         group_list.append(group_data)
 
@@ -29,19 +28,20 @@ def get_cart():
 # 장바구니 페이지에서 최종구매 버튼 클릭(POST, UPDATE(해당 그룹의 인원수 업데이트))
 # => 구매개수도 requeset로 받고, 해당 세션에서는 그 항목삭제되고, DB에 주문테이블에 추가, 그룹테이블에 업데이트 처리.
 
-@cart_bp.route('/cart/<int:group_id>/purchase', methods=['POST'])
+@cart_bp.route('/cart/purchase', methods=['POST'])
 @login_required
-def purchase(group_id):
+def group_purchase():
     # 요청에서 구매 수량을 가져옴
     data = request.get_json()
     purchase_quantity = data.get('구매수량')
+    group_id = data.get('group_id')
 
     # 구매 수량이 유효한지 확인
     if not purchase_quantity or purchase_quantity<=0:
         return jsonify({'error': 'Invalid purchase quantity'}), 400
 
-    # 그룹을 데이터베이스에서 찾습니다.
-    group = Group.query.filter_by(gid=group_id).first()
+    # 그룹을 DB에서 찾습니다.
+    group = Gonggu_group.query.filter_by(id=group_id).first()
     if not group:
         return jsonify({'error': 'Group not found'}), 404
 

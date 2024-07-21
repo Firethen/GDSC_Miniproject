@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from app.models import db
-from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
+from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
 
 # Flask 애플리케이션을 생성하는 팩토리 함수
 def create_app():
@@ -24,11 +24,12 @@ def create_app():
         return redirect(url_for('login'))
 
     #데이터베이스 모델 import 
-    from app.models import User,product
+    #from app.models import User,Product,cart
 
     # Blueprint import
     from app.login import login_bp
     from app.product import product_bp
+    from app.cart import cart_bp
 
     # Blueprint 등록
     app.register_blueprint(login_bp)

@@ -105,10 +105,10 @@ def join_group():
     if not group_id:
         return jsonify({'error': 'Group ID is required'}), 400
 
-    group = Gonggu_product.query.filter_by(id=group_id).first()
+    group = Gonggu_group.query.filter_by(id=group_id).first()
     if not group:
         return jsonify({'error': 'Gonggu_group not found'}), 404
-
+    
     # 세션에 그룹 ID 저장 (장바구니 기능)
     if 'cart' not in session:
         session['cart'] = []
