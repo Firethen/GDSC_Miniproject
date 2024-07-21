@@ -23,9 +23,6 @@ def create_app():
     def unauthorized():
         return redirect(url_for('login'))
 
-    #데이터베이스 모델 import 
-    #from app.models import User,Product,cart
-
     # Blueprint import
     from app.login import login_bp
     from app.product import product_bp

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, json
 from flask_login import login_user, logout_user, login_required
 from app.models import db, User, Region
 

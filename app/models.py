@@ -26,16 +26,16 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
     identification = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(5), nullable=False)  # 컬럼명 수정
-    password_hash = db.Column(db.String(20), nullable=False)  # 컬럼명 수정
+    password = db.Column(db.String(20), nullable=False)  # 컬럼명 수정
     address = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.String(11), nullable=False)
     region_id = db.Column(db.Integer, db.ForeignKey('region.id'), nullable=False)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password, password)
 
 class Product(db.Model):
     __tablename__ = 'product'
