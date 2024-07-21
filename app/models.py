@@ -1,105 +1,103 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, jsonify, abort
-from flask import redirect, url_for
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-import pymysql
+from flask import Flask
+from flask_login import LoginManager, UserMixin
 
 db = SQLAlchemy()
 
-#모델 전부다 클래스로 만들고, 필요한 함수가 더 있을란가 모르겠네.;
-
 class Market(db.Model):
-    __tablename__ = 'market' 
-    market_id = db.Column('id')
-    market_name = db.Column('name')
+    __tablename__ = 'market'
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    name = db.Column(db.String(50), nullable=False)  # 컬럼명 수정
 
 class Region_Market(db.Model):
     __tablename__ = 'region_market_link'
-    region_market_id = db.Column('id')
-    region_id = db.Column('region_id')
-    market_id = db.Column('market_id') 
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    region_id = db.Column(db.Integer, db.ForeignKey('region.id'), nullable=False)
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
 
 class Region(db.Model):
     __tablename__ = 'region'
-    r_id = db.Column('id')
-    dong_name = db.Column('dong')   #동 이름
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    dong = db.Column(db.String(30), nullable=False)  # 컬럼명 수정
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'customer' 
-    id = db.Column('id')
-    identification = db.Column('identification')
-    username = db.Column('name')
-    password_hash = db.Column('password')
-    address = db.Column('address')
-    phone = db.Column('phone')
-    region_id = db.Column('region_id')
-    #zzim = db.Column('관심상품')
+    __tablename__ = 'customer'
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    identification = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(5), nullable=False)  # 컬럼명 수정
+    password_hash = db.Column(db.String(20), nullable=False)  # 컬럼명 수정
+    address = db.Column(db.String(50), nullable=False)
+    phone = db.Column(db.String(11), nullable=False)
+    region_id = db.Column(db.Integer, db.ForeignKey('region.id'), nullable=False)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-    def check_password(self,password):
+
+    def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+
 class Product(db.Model):
     __tablename__ = 'product'
-    pid = db.Column('id')
-    name = db.Column('name')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    name = db.Column(db.String(50))
 
 class Gonggu_product(db.Model):
     __tablename__ = 'gonggu_product'
-    id = db.Column('id')
-    market_id = db.Column('market_id')
-    product_id = db.Column('product_id')
-    price = db.Column('price')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
 
 class Product_like(db.Model):
     __tablename__ = 'product_like'
-    id = db.Column('id')
-    customer_id = db.Column('customer_id')
-    product_id = db.Column('product_id')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
 class Market_like(db.Model):
     __tablename__ = 'market_like'
-    id = db.Column('id')
-    customer_id = db.Column('customer_id')
-    market_id = db.Column('market_id')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
 
 class Keyword(db.Model):
     __tablename__ = 'keyword'
-    id = db.Column('id')
-    keyword_name = db.Column('keyword')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    keyword = db.Column(db.String(30), nullable=False)  # 컬럼명 수정
 
 class Keyword_market_link(db.Model):
     __tablename__ = 'keyword_market_link'
-    id = db.Column('id')
-    keyword_id = db.Column('keyword_id')
-    market_id = db.Column('market_id')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    keyword_id = db.Column(db.Integer, db.ForeignKey('keyword.id'), nullable=False)
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
 
 class Purchase(db.Model):
     __tablename__ = 'purchase'
-    id = db.Column('id')
-    customer_id = db.Column('customer_id')
-    group_id = db.Column('gonggu_group_id')
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    gonggu_group_id = db.Column(db.Integer, db.ForeignKey('gonggu_group.id'), nullable=False)
 
-class Gonggu_product(db.Model):
-    __tablename__ = 'gonggu_product'
-    id = db.Column('id')
-    product_id = db.Column('gonggu_product_id')
-    size = db.Column('size')
+class Gonggu_group(db.Model):
+    __tablename__ = 'gonggu_group'  # 테이블명 수정
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    gonggu_product_id = db.Column(db.Integer, db.ForeignKey('gonggu_product.id'), nullable=False)
+    size = db.Column(db.Integer, nullable=False)
 
-#---------------------------------------
+# ---------------------------------------
 class Order(db.Model):
-    __tablename__ = '주문' 
-    gid = db.Column('그룹ID')
-    user_id = db.Column('고객ID') 
-    interest_item = db.Column('관심품목')
-    quantity = db.Column('수량')
-
+    __tablename__ = 'order'  # 테이블명 수정
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    gid = db.Column(db.Integer, nullable=False)  # 그룹ID
+    user_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)  # 고객ID
+    interest_item = db.Column(db.String(255))  # 관심품목
+    quantity = db.Column(db.Integer)  # 수량
 
 class Group(db.Model):
-    __tablename__ = '그룹'
-    gid = db.Column('그룹ID')
-    product_id = db.Column('상품ID')
-    market_id = db.Column('마켓ID')
-    max_size = db.Column('최대규모')
-    current_size = db.Column('현재규모')
+    __tablename__ = 'group'  # 테이블명 수정
+    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
+    gid = db.Column(db.Integer, nullable=False)  # 그룹ID
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)  # 상품ID
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)  # 마켓ID
+    max_size = db.Column(db.Integer, nullable=False)  # 최대규모
+    current_size = db.Column(db.Integer, nullable=False)  # 현재규모

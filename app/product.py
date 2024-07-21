@@ -1,7 +1,7 @@
 #상품에 대한 공동구매, 관심클릭에 대한 CRUD구현
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
-from app.models import db, Product, Group, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link
+from app.models import db, Product, Group, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
 import json
 
 product_bp = Blueprint('product', __name__)
@@ -42,7 +42,7 @@ def get_products():
                 product_list.append(product_data)
     return jsonify(product_list)
 
-#바로 위의 상품리스트에서 가지고있던 상품id 마켓id 바탕으로 <마켓이름 전달, (상품찜,마켓찜) 여부, 마켓의 키워드>를 return해주겠음.
+#바로 위의 상품리스트에서 가지고있던 상품id 마켓id 바탕으로 <공구상품id, 가격, 그리고 각 그룹들id와 인원, 마켓이름 전달, (상품찜,마켓찜) 여부, 마켓의 키워드>를 return해주겠음.
 @product_bp.route('/product-details', methods=['POST'])
 @login_required
 def get_product_details():
@@ -50,10 +50,28 @@ def get_product_details():
     product_id = data.get('product_id')
     market_id = data.get('market_id')
     p_like,m_like = False
+    
+    #공구상품id, 가격 찾기
+    gonggu_product = Gonggu_product.query.filter_by(market_id=market_id,product_id = product_id).first()
+    gonggu_product_id = gonggu_product.id
+    gonggu_product_price = gonggu_product.price
+    
+    #공구 상품id에 따른 공구 그룹들과 그룹size를 쌍으로 리스트화
+    gonggu_groups = Gonggu_group.query.filter_by(product_id=gonggu_product_id).all()
+    group_list = []
+    for group in gonggu_groups:
+        group_data = {
+            'id': group.id,
+            'size': group.size
+        }
+        group_list.append(group_data)
+        
 
+    #마켓이름 찾기
     market = Market.query.filter_by(market_id=market_id).first()
     market_name = market.market_name
 
+    #사용자가 마켓,상품찜한지 여부찾기
     user_id = current_user.id
     prod_like = Product_like.query.filter_by(customer_id=user_id,product_id=product_id).first()
     if prod_like:
@@ -61,36 +79,35 @@ def get_product_details():
     mark_like = Market_like.query.filter_by(customer_id=user_id,market_id=market_id).first()
     if mark_like:
         m_like = True
-    #keyword_ids를 사용하여 Keyword 테이블에서 해당 키워드 이름들을 조회
     keywords = Keyword.query.filter(Keyword.id.in_(keyword_ids)).all()
-    #조회된 키워드 이름들을 리스트로 변환
     keyword_names = [keyword.keyword_name for keyword in keywords]
-    
     keyword_links = Keyword_market_link.query.filter_by(market_id=market_id).all()
     keyword_ids = [link.keyword_id for link in keyword_links]
+
     return_data = {
             'product_id': product_id,
             'market_id': market_id,
             'market_name': market_name,
             'product_like': p_like,             #상품 찜 여부(True,False로 나타냄)
             'market_like': m_like,              #마켓 찜 여부
-            'keyword_names': keyword_names      # 키워드 이름이 리스트형태
+            'keyword_names': keyword_names,      # 키워드 이름이 리스트형태
+            'price': gonggu_product_price,
+            'groups': group_list                #공구그룹id와 각 size가 쌍(dict)으로 존재하는 리스트.
     }
     return jsonify(return_data)
 
 # 그룹 참여 라우트
-@product_bp.route('/products/<int:product_id>/join_group', methods=['POST'])
+@product_bp.route('/product-details/group', methods=['POST'])
 @login_required
 def join_group():
     data = request.get_json()
     group_id = data.get('group_id')
-
     if not group_id:
         return jsonify({'error': 'Group ID is required'}), 400
 
-    group = Group.query.filter_by(gid=group_id).first()
+    group = Gonggu_product.query.filter_by(id=group_id).first()
     if not group:
-        return jsonify({'error': 'Group not found'}), 404
+        return jsonify({'error': 'Gonggu_group not found'}), 404
 
     # 세션에 그룹 ID 저장 (장바구니 기능)
     if 'cart' not in session:
