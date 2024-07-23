@@ -37,6 +37,7 @@ def group_purchase():
     group_id = data.get('group_id')
 
     # 구매 수량이 유효한지 확인
+    purchase_quantity = int(purchase_quantity)
     if not purchase_quantity or purchase_quantity<=0:
         return jsonify({'error': 'Invalid purchase quantity'}), 400
 

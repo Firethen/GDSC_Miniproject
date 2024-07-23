@@ -24,7 +24,7 @@ def get_products():
     product_list = []
     for product in products:
         #공구상품에서 가져옵니다.
-        gonggu_products = Gonggu_product.query.filter_by(product_id=product.pid).all()
+        gonggu_products = Gonggu_product.query.filter_by(product_id=product.id).all()
         for gonggu_product in gonggu_products:
             if not gonggu_product:
                 continue
@@ -32,10 +32,10 @@ def get_products():
         
             #사용자의 지역에 일치하는 상품만 리스트로 반환
             regions = Region_Market.query.filter_by(market_id=market_id).all()
-            matching_region = [region for region in regions if region.r_id == user_region_id]
+            matching_region = [region for region in regions if region.id == user_region_id]
             if matching_region:     #matching_region이 리스트긴하지만, len이 1이어야 할것.
                 product_data = {
-                    'id': product.pid,                  #상품id
+                    'id': product.id,                  #상품id
                     'market_id' : market_id,            #해당 상품의 마켓id
                     'name': product.name,               #상품이름
                 }
@@ -49,7 +49,8 @@ def get_product_details():
     data = request.get_json()
     product_id = data.get('product_id')
     market_id = data.get('market_id')
-    p_like,m_like = False
+    p_like = False
+    m_like = True
     
     #공구상품id, 가격 찾기
     gonggu_product = Gonggu_product.query.filter_by(market_id=market_id,product_id = product_id).first()
@@ -57,7 +58,7 @@ def get_product_details():
     gonggu_product_price = gonggu_product.price
     
     #공구 상품id에 따른 공구 그룹들과 그룹size를 쌍으로 리스트화
-    gonggu_groups = Gonggu_group.query.filter_by(product_id=gonggu_product_id).all()
+    gonggu_groups = Gonggu_group.query.filter_by(gonggu_product_id=gonggu_product_id).all()
     group_list = []
     for group in gonggu_groups:
         group_data = {
@@ -68,8 +69,8 @@ def get_product_details():
         
 
     #마켓이름 찾기
-    market = Market.query.filter_by(market_id=market_id).first()
-    market_name = market.market_name
+    market = Market.query.filter_by(id=market_id).first()
+    market_name = market.name
 
     #사용자가 마켓,상품찜한지 여부찾기
     user_id = current_user.id
@@ -79,10 +80,13 @@ def get_product_details():
     mark_like = Market_like.query.filter_by(customer_id=user_id,market_id=market_id).first()
     if mark_like:
         m_like = True
-    keywords = Keyword.query.filter(Keyword.id.in_(keyword_ids)).all()
-    keyword_names = [keyword.keyword_name for keyword in keywords]
+    
     keyword_links = Keyword_market_link.query.filter_by(market_id=market_id).all()
     keyword_ids = [link.keyword_id for link in keyword_links]
+    
+    keywords = Keyword.query.filter(Keyword.id.in_(keyword_ids)).all()
+    keyword_names = [keyword.keyword for keyword in keywords]
+
 
     return_data = {
             'product_id': product_id,
