@@ -1,7 +1,7 @@
 #상품에 대한 공동구매, 관심클릭에 대한 CRUD구현
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
-from app.models import db, Product, Group, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
+from app.models import db, Product, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
 import json
 
 product_bp = Blueprint('product', __name__)
@@ -120,3 +120,21 @@ def join_group():
 
     return jsonify({'group_id': group_id}), 200
 
+#사용자가 공동구매그룹을 새로 [생성]할 때
+@product_bp.route('/product-details/group/make', methods=['POST'])
+@login_required
+def make_group():
+    try:
+        data = request.get_json()
+        gonggu_product_id = data.get('gonggu_product_id')   # 공동구매상품테이블의 키(id)
+        max_size = data.get('max_size')                     # 생성하려는 그룹의 최대 사이즈.
+
+        new_group = Gonggu_group(gonggu_product_id = gonggu_product_id,size = max_size)
+        db.session.add(new_group)
+        db.session.commit()
+        
+        return jsonify({'status': 'success', 'group_id': new_group.id}), 201
+    except Exception as e:      #예외 발생시 롤백(트랜잭션 관리)
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    

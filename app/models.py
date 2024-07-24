@@ -83,21 +83,3 @@ class Gonggu_group(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
     gonggu_product_id = db.Column(db.Integer, db.ForeignKey('gonggu_product.id'), nullable=False)
     size = db.Column(db.Integer, nullable=False)
-
-# ---------------------------------------
-class Order(db.Model):
-    __tablename__ = 'order'  # 테이블명 수정
-    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
-    gid = db.Column(db.Integer, nullable=False)  # 그룹ID
-    user_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)  # 고객ID
-    interest_item = db.Column(db.String(255))  # 관심품목
-    quantity = db.Column(db.Integer)  # 수량
-
-class Group(db.Model):
-    __tablename__ = 'group'  # 테이블명 수정
-    id = db.Column(db.Integer, primary_key=True)  # 컬럼명 수정 및 primary key 설정
-    gid = db.Column(db.Integer, nullable=False)  # 그룹ID
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)  # 상품ID
-    market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)  # 마켓ID
-    max_size = db.Column(db.Integer, nullable=False)  # 최대규모
-    current_size = db.Column(db.Integer, nullable=False)  # 현재규모
