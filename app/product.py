@@ -129,6 +129,15 @@ def make_group():
         gonggu_product_id = data.get('gonggu_product_id')   # 공동구매상품테이블의 키(id)
         max_size = data.get('max_size')                     # 생성하려는 그룹의 최대 사이즈.
 
+        #이미 존재하는 그룹들을 가져옴
+        existing_groups = Gonggu_group.query.filter_by(gonggu_product_id=gonggu_product_id).all()
+        # 기존 그룹들의 size 값 리스트
+        existing_sizes = [group.size for group in existing_groups]
+        # max_size가 기존 그룹들의 size ± 1 범위 내에 있는지 확인
+        for size in existing_sizes:
+            if abs(size - max_size) <= 1:
+                return jsonify({'status': 'error', 'message': 'max_size가 기존재하는 그룹들의 size범위내에 있습니다.'}), 400
+
         new_group = Gonggu_group(gonggu_product_id = gonggu_product_id,size = max_size)
         db.session.add(new_group)
         db.session.commit()
