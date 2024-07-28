@@ -48,7 +48,7 @@ class Gonggu_product(db.Model):
     market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    title = db.Column(db.String(255))
+    title = db.Column(db.String, nullable=False)
 
 class Product_like(db.Model):
     __tablename__ = 'product_like'

@@ -93,3 +93,4 @@ def check_login():
         return jsonify({'logged_in': True}), 200
     else:
         return jsonify({'logged_in': False}), 200
+
