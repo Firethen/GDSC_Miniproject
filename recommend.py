@@ -1,3 +1,4 @@
+'''
 import mysql.connector
 import pandas as pd
 from surprise import Dataset, Reader, SVD
@@ -103,3 +104,4 @@ def recommend_gonggu_products_ml(user_id, n=5):
 user_id = 1
 recommended_gonggu_products = recommend_gonggu_products_ml(user_id)
 print("Recommended Gonggu Products for User 1:", recommended_gonggu_products)
+'''

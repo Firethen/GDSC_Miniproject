@@ -33,11 +33,14 @@ def create_app():
     from app.login import login_bp
     from app.product import product_bp
     from app.cart import cart_bp
+    from app.zzim import zzim_bp
 
     # Blueprint 등록
     app.register_blueprint(login_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(cart_bp)
+    app.register_blueprint(zzim_bp)
+
 
     @app.route('/test_db')
     def test_db():

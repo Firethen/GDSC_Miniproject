@@ -12,8 +12,8 @@ def zzim():
     data = request.get_json()
     product_id = data.get('product_id')
     market_id = data.get('market_id')
-    p_like = data.get('p_like')     #상품찜 의미(0이면 상품찜안누름, 1이면 상품찜 누름)
-    m_like = data.get('m_like')     #마켓찜 의미(마찬가지)
+    p_like = int(data.get('p_like'))     #상품찜 의미(0이면 상품찜안누름, 1이면 상품찜 누름)
+    m_like = int(data.get('m_like'))     #마켓찜 의미(마찬가지)
     user_id = current_user.id
     if p_like == 1 and m_like ==0:
         gonggu_product = Gonggu_product.query.filter_by(market_id=market_id,product_id = product_id).first()
@@ -44,8 +44,8 @@ def zzim_del():
     data = request.get_json()
     product_id = data.get('product_id')
     market_id = data.get('market_id')
-    p_like = data.get('p_like')     # p_like가 1이면 p_like를 삭제하겠다는 의미!!
-    m_like = data.get('m_like')     # 마찬가지
+    p_like = int(data.get('p_like'))     # p_like가 1이면 p_like를 삭제하겠다는 의미!!
+    m_like = int(data.get('m_like'))     # 마찬가지
     user_id = current_user.id
 
     # 상품 찜 제거
