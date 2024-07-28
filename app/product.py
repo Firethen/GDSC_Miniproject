@@ -74,7 +74,7 @@ def get_product_details():
 
     #사용자가 마켓,상품찜한지 여부찾기
     user_id = current_user.id
-    prod_like = Product_like.query.filter_by(customer_id=user_id,product_id=product_id).first()
+    prod_like = Product_like.query.filter_by(customer_id=user_id,gonggu_product_id=product_id).first()
     if prod_like:
         p_like = True
     mark_like = Market_like.query.filter_by(customer_id=user_id,market_id=market_id).first()
