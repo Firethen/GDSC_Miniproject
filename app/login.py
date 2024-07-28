@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, json
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from app.models import db, User, Region
 
 login_bp = Blueprint('login', __name__)
@@ -69,3 +69,19 @@ def logout():
         return jsonify({'message': 'Logged out successfully'}), 200
 
     abort(405)  # GET 요청은 허용하지 않음
+
+
+@login_bp.route('/get_user_info', methods=['GET'])
+@login_required
+def get_user_info():
+    user = current_user
+    region = Region.query.filter_by(id=user.region_id).first()
+    user_info = {
+        'ID': user.id,  # 여기서 ID는 DB-customer의 PK ID를 의미.(identification이랑 다름)
+        'User ID': user.identification,  # 이거는 실제로 유저가 입력하는 ID
+        'username': user.name,
+        'region_name': region.dong,  # 지역 ID가 아니라 지역의 이름을 return
+        'address': user.address,
+        'phone': user.phone
+    }
+    return jsonify(user_info), 200

@@ -42,6 +42,7 @@ def get_products():
                 product_list.append(product_data)
     return jsonify(product_list)
 
+
 #바로 위의 상품리스트에서 가지고있던 상품id 마켓id 바탕으로 <공구상품id, 가격, 그리고 각 그룹들id와 인원, 마켓이름 전달, (상품찜,마켓찜) 여부, 마켓의 키워드>를 return해주겠음.
 @product_bp.route('/product-details', methods=['POST'])
 @login_required
@@ -51,11 +52,12 @@ def get_product_details():
     market_id = data.get('market_id')
     p_like = False
     m_like = True
-    
-    #공구상품id, 가격 찾기
+
+    #공구상품id, 가격,타이틀 찾기
     gonggu_product = Gonggu_product.query.filter_by(market_id=market_id,product_id = product_id).first()
     gonggu_product_id = gonggu_product.id
     gonggu_product_price = gonggu_product.price
+    gonggu_product_title = gonggu_product.title
     
     #공구 상품id에 따른 공구 그룹들과 그룹size를 쌍으로 리스트화
     gonggu_groups = Gonggu_group.query.filter_by(gonggu_product_id=gonggu_product_id).all()
@@ -67,7 +69,6 @@ def get_product_details():
         }
         group_list.append(group_data)
         
-
     #마켓이름 찾기
     market = Market.query.filter_by(id=market_id).first()
     market_name = market.name
@@ -87,11 +88,11 @@ def get_product_details():
     keywords = Keyword.query.filter(Keyword.id.in_(keyword_ids)).all()
     keyword_names = [keyword.keyword for keyword in keywords]
 
-
     return_data = {
             'product_id': product_id,
             'market_id': market_id,
             'market_name': market_name,
+            'title' : gonggu_product_title,
             'product_like': p_like,             #상품 찜 여부(True,False로 나타냄)
             'market_like': m_like,              #마켓 찜 여부
             'keyword_names': keyword_names,      # 키워드 이름이 리스트형태
@@ -99,6 +100,35 @@ def get_product_details():
             'groups': group_list                #공구그룹id와 각 size가 쌍(dict)으로 존재하는 리스트.
     }
     return jsonify(return_data)
+
+@product_bp.route('/all-products', methods=['GET'])
+def get_all_gonggu_products():
+    # 모든 Gonggu_product를 찾음
+    gonggu_products = Gonggu_product.query.all()
+    
+    gonggu_product_list = []
+    for gonggu_product in gonggu_products:
+        product = Product.query.filter_by(id=gonggu_product.product_id).first()
+        if not product:
+            continue
+
+        # 마켓 이름 찾기
+        market = Market.query.filter_by(id=gonggu_product.market_id).first()
+        market_name = market.name if market else 'Unknown'
+
+        gonggu_product_data = {
+            'gonggu_product_id': gonggu_product.id,
+            'product_id': product.id,
+            'market_id': gonggu_product.market_id,
+            'name': product.name,
+            'price': gonggu_product.price,
+            'title': gonggu_product.title,
+            'market_name': market_name
+        }
+        gonggu_product_list.append(gonggu_product_data)
+    
+    return jsonify(gonggu_product_list)
+
 
 # 그룹 참여 라우트
 @product_bp.route('/product-details/group', methods=['POST'])
