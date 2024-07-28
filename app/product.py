@@ -51,11 +51,12 @@ def get_product_details():
     market_id = data.get('market_id')
     p_like = False
     m_like = True
-    
-    #공구상품id, 가격 찾기
+
+    #공구상품id, 가격,타이틀 찾기
     gonggu_product = Gonggu_product.query.filter_by(market_id=market_id,product_id = product_id).first()
     gonggu_product_id = gonggu_product.id
     gonggu_product_price = gonggu_product.price
+    gonggu_product_title = gonggu_product.title
     
     #공구 상품id에 따른 공구 그룹들과 그룹size를 쌍으로 리스트화
     gonggu_groups = Gonggu_group.query.filter_by(gonggu_product_id=gonggu_product_id).all()
@@ -67,7 +68,6 @@ def get_product_details():
         }
         group_list.append(group_data)
         
-
     #마켓이름 찾기
     market = Market.query.filter_by(id=market_id).first()
     market_name = market.name
@@ -92,6 +92,7 @@ def get_product_details():
             'product_id': product_id,
             'market_id': market_id,
             'market_name': market_name,
+            'title' : gonggu_product_title,
             'product_like': p_like,             #상품 찜 여부(True,False로 나타냄)
             'market_like': m_like,              #마켓 찜 여부
             'keyword_names': keyword_names,      # 키워드 이름이 리스트형태
