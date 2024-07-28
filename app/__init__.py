@@ -17,12 +17,12 @@ def create_app():
     #LoginManager 초기화
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'login'  # 로그인 페이지의 뷰 함수 이름
+    login_manager.login_view = 'login.login'  # 로그인 페이지의 뷰 함수 이름
 
     # 로그인되지않은 사용자가 로그인필요 페이지 접근할 때 핸들링
     @login_manager.unauthorized_handler
     def unauthorized():
-        return redirect(url_for('login'))
+        return redirect(url_for('login.login'))
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -34,12 +34,17 @@ def create_app():
     from app.product import product_bp
     from app.cart import cart_bp
     from app.zzim import zzim_bp
+    from app.zzim_market import market_like_bp
+    from app.market import market_bp
+
 
     # Blueprint 등록
     app.register_blueprint(login_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(cart_bp)
     app.register_blueprint(zzim_bp)
+    app.register_blueprint(market_like_bp, url_prefix='/api')
+    app.register_blueprint(market_bp, url_prefix='/api')
 
 
     @app.route('/test_db')

@@ -1,4 +1,4 @@
-'''from flask import Flask, render_template, request, jsonify, abort
+from flask import Flask, render_template, request, jsonify, abort
 from flask import redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -44,4 +44,6 @@ def a():
     return f"<p>{result}</p>"
 
 if __name__ == "__main__":
-    app.run(debug=True)'''
+    app.run(debug=True)
+
+app.register_blueprint(market_bp, url_prefix='/api')
