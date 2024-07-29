@@ -94,18 +94,3 @@ def check_login():
     else:
         return jsonify({'logged_in': False}), 200
 
-
-@login_bp.route('/get_user_info', methods=['GET'])
-@login_required
-def get_user_info():
-    user = current_user
-    region = Region.query.filter_by(id=user.region_id).first()
-    user_info = {
-        'ID': user.id,  # 여기서 ID는 DB-customer의 PK ID를 의미.(identification이랑 다름)
-        'User ID': user.identification,  # 이거는 실제로 유저가 입력하는 ID
-        'username': user.name,
-        'region_name': region.dong,  # 지역 ID가 아니라 지역의 이름을 return
-        'address': user.address,
-        'phone': user.phone
-    }
-    return jsonify(user_info), 200

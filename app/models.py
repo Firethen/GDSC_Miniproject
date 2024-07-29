@@ -73,14 +73,26 @@ class Keyword_market_link(db.Model):
     keyword_id = db.Column(db.Integer, db.ForeignKey('keyword.id'), nullable=False)
     market_id = db.Column(db.Integer, db.ForeignKey('market.id'), nullable=False)
 
-class Purchase(db.Model):
-    __tablename__ = 'purchase'
-    id = db.Column(db.Integer, primary_key=True)  # 
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
-    gonggu_group_id = db.Column(db.Integer, db.ForeignKey('gonggu_group.id'), nullable=False)
+# class Purchase(db.Model):
+#     __tablename__ = 'purchase'
+#     id = db.Column(db.Integer, primary_key=True)  # 
+#     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+#     gonggu_group_id = db.Column(db.Integer, db.ForeignKey('gonggu_group.id'), nullable=False)
 
 class Gonggu_group(db.Model):
     __tablename__ = 'gonggu_group' 
     id = db.Column(db.Integer, primary_key=True)  # 
     gonggu_product_id = db.Column(db.Integer, db.ForeignKey('gonggu_product.id'), nullable=False)
     size = db.Column(db.Integer, nullable=False)
+
+class Purchase(db.Model):
+    __tablename__ = 'purchase'
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    gonggu_group_id = db.Column(db.Integer, db.ForeignKey('gonggu_group.id'))
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    gonggu_product_id = db.Column(db.Integer, db.ForeignKey('gonggu_product.id'), nullable=False)
+
+    customer = db.relationship('User', backref='purchases')
+    gonggu_group = db.relationship('Gonggu_group', backref='purchases')
+    gonggu_product = db.relationship('Gonggu_product', backref='purchases')
