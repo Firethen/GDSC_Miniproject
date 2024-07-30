@@ -1,12 +1,9 @@
 #상품에 대한 공동구매, 관심클릭에 대한 CRUD구현
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
-<<<<<<< HEAD
-from app.models import db, Product, User, Market, Region, Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group, Purchase
-=======
 from app.recommend import recommend_gonggu_products_ml
-from app.models import db, Product, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
->>>>>>> f2e6c25e19dba7bb62b58c9d609158b68a221737
+from app.models import db, Product, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group, Purchase
+
 import json
 
 product_bp = Blueprint('product', __name__)
