@@ -24,12 +24,10 @@ def get_products():
     recommended_products = Gonggu_product.query.filter(Gonggu_product.id.in_(recommended_gonggu_products)).all()
     product_list = []
     for r_p in recommended_products:
-        product_new = Product.query.filter_by(id = r_p.product_id).first()
-        product_name = product_new.name
         product_data = {
             'id': r_p.product_id,                  #상품id
             'market_id' : r_p.market_id,           #해당 상품의 마켓id
-            'name': product_name,                  #상품이름
+            'name': r_p.title,                     #상품타이틀
         }
         product_list.append(product_data)
     return jsonify(product_list)
