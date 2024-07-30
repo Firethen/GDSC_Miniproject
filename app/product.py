@@ -196,15 +196,14 @@ def make_group():
 def purchase_product():
     data = request.get_json()
 
-    customer_id = current_user.id  # 현재 로그인된 사용자 ID
+    customer_id = current_user.id
     quantity = data.get('quantity')
-    product_id = data.get('product_id')  # 사용자가 제공하는 Product ID
-    gonggu_group_id = data.get('gonggu_group_id', 1)  # Optional
+    product_id = data.get('product_id')
+    gonggu_group_id = data.get('gonggu_group_id', 1) 
 
     if not quantity or not product_id:
         return jsonify({'message': 'Quantity and Product ID are required'}), 400
 
-    # Product ID로 Gonggu_product 찾기
     gonggu_product = Gonggu_product.query.filter_by(product_id=product_id).first()
     if not gonggu_product:
         return jsonify({'message': 'Gonggu product not found'}), 404
@@ -212,9 +211,9 @@ def purchase_product():
     try:
         purchase = Purchase(
             customer_id=customer_id,
-            gonggu_group_id=gonggu_group_id,  # Optional
+            gonggu_group_id=gonggu_group_id,  
             quantity=quantity,
-            gonggu_product_id=gonggu_product.id  # 찾은 Gonggu_product의 ID 사용
+            gonggu_product_id=gonggu_product.id  
         )
         db.session.add(purchase)
         db.session.commit()
@@ -222,3 +221,35 @@ def purchase_product():
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': str(e)}), 500
+    
+
+@product_bp.route('/purchase-list', methods=['GET'])
+@login_required
+def get_user_purchases():
+    user_id = current_user.id
+
+    purchases = Purchase.query.filter_by(customer_id=user_id).all()
+    
+    if not purchases:
+        return jsonify([]), 200
+
+    purchase_list = []
+    for purchase in purchases:
+        gonggu_product = Gonggu_product.query.filter_by(id=purchase.gonggu_product_id).first()
+        product = Product.query.filter_by(id=gonggu_product.product_id).first() if gonggu_product else None
+        market = Market.query.filter_by(id=gonggu_product.market_id).first() if gonggu_product else None
+        
+        purchase_data = {
+            'purchase_id': purchase.id,
+            'product_id': product.id if product else None,
+            'product_name': product.name if product else 'Unknown',
+            'gonggu_product_id': gonggu_product.id if gonggu_product else None,
+            'price': gonggu_product.price if gonggu_product else None,
+            'quantity': purchase.quantity,
+            'market_id': gonggu_product.market_id if gonggu_product else None,
+            'market_name': market.name if market else 'Unknown',
+            'title' : gonggu_product.title if gonggu_product else '제목없음'
+        }
+        purchase_list.append(purchase_data)
+    
+    return jsonify(purchase_list), 200
