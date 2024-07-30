@@ -9,7 +9,7 @@ product_bp = Blueprint('product', __name__)
 
 #상품 리스트로 넘겨주기
 @product_bp.route('/products', methods=['GET'])
-@login_required
+@login_required 
 def get_products():
     # 현재 로그인된 유저의 ID를 가져옵니다
     user_id = current_user.id
@@ -114,6 +114,7 @@ def get_product_details():
 
 @product_bp.route('/all-products', methods=['GET'])
 def get_all_gonggu_products():
+    # 모든 Gonggu_product를 찾음
     gonggu_products = Gonggu_product.query.all()
     
     gonggu_product_list = []
@@ -122,6 +123,7 @@ def get_all_gonggu_products():
         if not product:
             continue
 
+        # 마켓 이름 찾기
         market = Market.query.filter_by(id=gonggu_product.market_id).first()
         market_name = market.name if market else 'Unknown'
 
@@ -159,7 +161,6 @@ def join_group():
 
     return jsonify({'group_id': group_id}), 200
 
-
 #사용자가 공동구매그룹을 새로 [생성]할 때
 @product_bp.route('/product-details/group/make', methods=['POST'])
 @login_required
@@ -194,28 +195,29 @@ def make_group():
 def purchase_product():
     data = request.get_json()
 
-    customer_id = current_user.id  
+    customer_id = current_user.id  # 현재 로그인된 사용자 ID
     quantity = data.get('quantity')
-    product_id = data.get('product_id')  
-    gonggu_group_id = data.get('gonggu_group_id', 1) 
+    product_id = data.get('product_id')  # 사용자가 제공하는 Product ID
+    gonggu_group_id = data.get('gonggu_group_id', 1)  # Optional
 
     if not quantity or not product_id:
-        return jsonify({'message': 'Quantity and Product ID are required'}), 
+        return jsonify({'message': 'Quantity and Product ID are required'}), 400
 
+    # Product ID로 Gonggu_product 찾기
     gonggu_product = Gonggu_product.query.filter_by(product_id=product_id).first()
     if not gonggu_product:
-        return jsonify({'message': 'Gonggu product not found'}), 
+        return jsonify({'message': 'Gonggu product not found'}), 404
 
     try:
         purchase = Purchase(
             customer_id=customer_id,
-            gonggu_group_id=gonggu_group_id, 
+            gonggu_group_id=gonggu_group_id,  # Optional
             quantity=quantity,
-            gonggu_product_id=gonggu_product.id 
+            gonggu_product_id=gonggu_product.id  # 찾은 Gonggu_product의 ID 사용
         )
         db.session.add(purchase)
         db.session.commit()
-        return jsonify({'message': 'Purchase completed successfully'}),
+        return jsonify({'message': 'Purchase completed successfully'}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': str(e)}), 500

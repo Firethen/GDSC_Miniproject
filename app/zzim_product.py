@@ -48,7 +48,7 @@ def delete_product_like():
 def get_favorite_products():
     user_id = current_user.id
     favorite_products = Product_like.query.filter_by(customer_id=user_id).all()
-    
+
     product_list = []
     for favorite in favorite_products:
         gonggu_product = Gonggu_product.query.filter_by(product_id=favorite.gonggu_product_id).first()
@@ -58,5 +58,5 @@ def get_favorite_products():
                 'name': gonggu_product.title,
                 'price': gonggu_product.price
             })
-    
+
     return jsonify(product_list), 200

@@ -84,7 +84,7 @@ def recommend_gonggu_products_ml(user_id, algo, user_product_df, gonggu_products
 @recommend_bp.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
     user_id = request.args.get('user_id', type=int)
-    
+
     if user_id is None:
         return jsonify({'error': 'User ID is required'}), 400
 
