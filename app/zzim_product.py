@@ -43,6 +43,7 @@ def delete_product_like():
 
     return jsonify({'message': 'Product like does not exist'}), 400
 
+
 @zzim_product_bp.route('/favorite-products', methods=['GET'])
 @login_required
 def get_favorite_products():
@@ -58,5 +59,4 @@ def get_favorite_products():
                 'name': gonggu_product.title,
                 'price': gonggu_product.price
             })
-
     return jsonify(product_list), 200
