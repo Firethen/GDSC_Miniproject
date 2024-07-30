@@ -50,6 +50,7 @@ class Gonggu_product(db.Model):
     price = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String, nullable=False)
 
+
 class Product_like(db.Model):
     __tablename__ = 'product_like'
     id = db.Column(db.Integer, primary_key=True)  # 

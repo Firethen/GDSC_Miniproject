@@ -37,6 +37,7 @@ def create_app():
     from app.zzim_market import market_like_bp
     from app.market import market_bp
     from app.zzim_product import zzim_product_bp
+    from app.recommend import recommend_bp
 
 
     # Blueprint 등록
@@ -47,6 +48,7 @@ def create_app():
     app.register_blueprint(market_like_bp, url_prefix='/api')
     app.register_blueprint(market_bp, url_prefix='/api')
     app.register_blueprint(zzim_product_bp)
+    app.register_blueprint(recommend_bp)
 
 
 
