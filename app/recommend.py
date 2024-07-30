@@ -1,4 +1,3 @@
-'''
 import mysql.connector
 import pandas as pd
 from surprise import Dataset, Reader, SVD
@@ -8,10 +7,10 @@ from surprise import accuracy
 try:
     # MySQL 데이터베이스에 연결
     db_connection = mysql.connector.connect(
-        host="127.0.0.1",
-        user="root",
-        password="ghkdwlqls1!",
-        database="myDatabase",
+        host="gdsc-mini24.c58asus2kgn4.ap-northeast-2.rds.amazonaws.com",
+        user="admin",
+        password="k7rN%7)iSa%-L",
+        database="gonggu",
         port=3306 
     )
 
@@ -104,4 +103,3 @@ def recommend_gonggu_products_ml(user_id, n=5):
 user_id = 1
 recommended_gonggu_products = recommend_gonggu_products_ml(user_id)
 print("Recommended Gonggu Products for User 1:", recommended_gonggu_products)
-'''

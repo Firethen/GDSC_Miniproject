@@ -1,26 +1,39 @@
 #상품에 대한 공동구매, 관심클릭에 대한 CRUD구현
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
+from app.recommend import recommend_gonggu_products_ml
 from app.models import db, Product, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group
 import json
 
 product_bp = Blueprint('product', __name__)
 
-#상품 리스트로 넘겨주기(로그인된 user의 지역과 일치하는 상품들만)
+#상품 리스트로 넘겨주기
 @product_bp.route('/products', methods=['GET'])
 @login_required 
 def get_products():
-
     # 현재 로그인된 유저의 ID를 가져옵니다
     user_id = current_user.id
-    
-    # 유저의 지역 정보를 가져옵니다
+    '''# 유저의 지역 정보를 가져옵니다
     user = User.query.filter_by(id=user_id).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    user_region_id = user.region_id
+    user_region_id = user.region_id'''
 
-    products = Product.query.all()
+    #추천알고리즘 적용
+    recommended_gonggu_products = recommend_gonggu_products_ml(user_id)
+    recommended_products = Gonggu_product.query.filter(Gonggu_product.id.in_(recommended_gonggu_products)).all()
+    product_list = []
+    for r_p in recommended_products:
+        product_new = Product.query.filter_by(id = r_p.product_id).first()
+        product_name = product_new.name
+        product_data = {
+            'id': r_p.product_id,                  #상품id
+            'market_id' : r_p.market_id,           #해당 상품의 마켓id
+            'name': product_name,                  #상품이름
+        }
+        product_list.append(product_data)
+    return jsonify(product_list)
+    '''products = Product.query.all()
     product_list = []
     for product in products:
         #공구상품에서 가져옵니다.
@@ -40,7 +53,7 @@ def get_products():
                     'name': product.name,               #상품이름
                 }
                 product_list.append(product_data)
-    return jsonify(product_list)
+    return jsonify(product_list)'''
 
 #바로 위의 상품리스트에서 가지고있던 상품id 마켓id 바탕으로 <공구상품id, 가격, 그리고 각 그룹들id와 인원, 마켓이름 전달, (상품찜,마켓찜) 여부, 마켓의 키워드>를 return해주겠음.
 @product_bp.route('/product-details', methods=['POST'])
