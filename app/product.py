@@ -2,7 +2,8 @@
 from flask import Blueprint, request, jsonify, abort, session
 from flask_login import login_required, current_user
 from app.recommend import recommend_gonggu_products_ml
-from app.models import db, Product, User, Market, Region, Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group, Purchase
+from app.models import db, Product, User, Market, Region,Region_Market, Gonggu_product, Product_like, Market_like, Keyword,Keyword_market_link, Gonggu_group, Purchase
+
 import json
 
 product_bp = Blueprint('product', __name__)
