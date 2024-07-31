@@ -189,6 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return 'assets/images/apple.jpg';
       case 10:
         return 'assets/images/tofu.png';
+      case 7:
+        return 'assets/images/고구마.jpg';
+      case 9:
+        return 'assets/images/고등어.jpg';
       default:
         return 'assets/images/veg2.png'; // 기본 이미지
     }
